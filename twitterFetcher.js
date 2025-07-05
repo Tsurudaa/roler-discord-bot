@@ -1,5 +1,5 @@
-const fetch = require('node-fetch');
-require('dotenv').config(); // Load .env variables
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+require('dotenv').config();
 
 const BEARER_TOKEN = process.env.TWITTER_BEARER_TOKEN;
 const TWITTER_USERNAME = 'BPSP_Official';
