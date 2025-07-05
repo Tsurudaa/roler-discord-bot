@@ -19,7 +19,7 @@ const bot = new Client({
 });
 
 bot.once('ready', () => {
-  const NEWS_CHANNEL_ID = '1390895505869115482'; // Replace with your channel ID
+  const NEWS_CHANNEL_ID = '1390895505869115482';
 
 async function checkForNewTweet() {
   const tweet = await fetchLatestTweet();
@@ -37,7 +37,7 @@ async function checkForNewTweet() {
   await channel.send({ embeds: [embed] });
 }
 
-// Start polling every 2 minutes
+
 setInterval(() => checkForNewTweet(bot), 2 * 60 * 1000);
   console.log(`Logged in as ${bot.user.tag}`);
 });
@@ -47,7 +47,7 @@ bot.login(process.env.DISCORD_BOT_TOKEN);
 const WELCOME_CHANNEL_ID = '1390209671087915079';
 const WELCOME_IMAGE_DIR = path.join(__dirname, 'welcome-images');
 
-const reactionRoleMessageId = 'your-message-id'; // Replace with your actual message ID
+const reactionRoleMessageId = 'your-message-id';
 const emojiRoleMap = {
   '✅': 'role-id-1',
   '🎮': 'role-id-2',
@@ -67,11 +67,11 @@ bot.on('guildMemberAdd', async member => {
   const channel = member.guild.channels.cache.get(WELCOME_CHANNEL_ID);
   if (!channel) return;
 
-  // Pick a random message and replace {user}
+  
   const messageTemplate = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
   const welcomeText = messageTemplate.replace('{user}', `<@${member.id}>`);
 
-  // Pick a random image
+
   let imagePath = null;
   try {
     const files = fs.readdirSync(WELCOME_IMAGE_DIR).filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file));
@@ -83,7 +83,7 @@ bot.on('guildMemberAdd', async member => {
     console.error('Error reading welcome image folder:', err);
   }
 
-  // Create the embed
+
   const embed = new EmbedBuilder()
     .setColor('#5865F2')
     .setTitle('⚔️ New Member!')
