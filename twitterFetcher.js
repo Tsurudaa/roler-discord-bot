@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 require('dotenv').config(); // Load .env variables
 
 const BEARER_TOKEN = process.env.TWITTER_BEARER_TOKEN;
