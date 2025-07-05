@@ -1,3 +1,4 @@
+require('./keepalive');
 const { EmbedBuilder } = require('discord.js');
 const { fetchLatestTweet } = require('./twitterFetcher');
 const fs = require('fs');
