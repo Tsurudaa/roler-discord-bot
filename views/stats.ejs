@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Server Stats</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .stats {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .chart-controls {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chart-controls label {
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .chart-controls select {
+      padding: 6px 10px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: none;
+      background-color: #2c2c3e;
+      color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Server Demographics</h1>
+    <a href="/menu">← Back to Menu</a>
+  </header>
+
+  <section class="stats">
+    <canvas id="statsChart" width="600" height="300"></canvas>
+
+    <div class="chart-controls">
+      <div>
+        <label><input type="checkbox" id="showJoins" checked> Show Joins</label>
+        <label><input type="checkbox" id="showLeaves" checked> Show Leaves</label>
+      </div>
+      <div>
+        <label for="periodSelect">Period:</label>
+        <select id="periodSelect">
+          <option value="day">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const periodSelect = document.getElementById('periodSelect');
+    const ctx = document.getElementById('statsChart').getContext('2d');
+
+    const rawData = {
+      joins: {
+        day: <%= stats.joinedToday %>,
+        week: <%= stats.joinedWeek %>,
+        month: <%= stats.joinedMonth %>
+      },
+      leaves: {
+        day: <%= stats.leftToday %>,
+        week: <%= stats.leftWeek %>,
+        month: <%= stats.leftMonth %>
+      }
+    };
+
+    const statsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [''],
+        datasets: [
+          {
+            label: 'Joins',
+            data: [rawData.joins.day],
+            borderColor: '#28a745',
+            backgroundColor: 'rgba(40, 167, 69, 0.2)',
+            tension: 0.3
+          },
+          {
+            label: 'Leaves',
+            data: [rawData.leaves.day],
+            borderColor: '#dc3545',
+            backgroundColor: 'rgba(220, 53, 69, 0.2)',
+            tension: 0.3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Server Join/Leave Trends'
+          }
+        },
+        scales: {
+          x: {
+            display: false
+          }
+        }
+      }
+    });
+
+    // Toggle datasets
+    document.getElementById('showJoins').addEventListener('change', function () {
+      statsChart.getDatasetMeta(0).hidden = !this.checked;
+      statsChart.update();
+    });
+
+    document.getElementById('showLeaves').addEventListener('change', function () {
+      statsChart.getDatasetMeta(1).hidden = !this.checked;
+      statsChart.update();
+    });
+
+    // Period filter
+    periodSelect.addEventListener('change', () => {
+      const period = periodSelect.value;
+      statsChart.data.datasets[0].data = [rawData.joins[period]];
+      statsChart.data.datasets[1].data = [rawData.leaves[period]];
+      statsChart.update();
+    });
+
+    // Real-time updates
+    const socket = io();
+    socket.on('memberUpdate', async () => {
+      const response = await fetch('/api/stats');
+      const updated = await response.json();
+
+      rawData.joins.day = updated.joinedToday;
+      rawData.joins.week = updated.joinedWeek;
+      rawData.joins.month = updated.joinedMonth;
+      rawData.leaves.day = updated.leftToday;
+      rawData.leaves.week = updated.leftWeek;
+      rawData.leaves.month = updated.leftMonth;
+
+      const period = periodSelect.value;
+      statsChart.data.datasets[0].data = [rawData.joins[period]];
+      statsChart.data.datasets[1].data = [rawData.leaves[period]];
+      statsChart.update();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Main Menu</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    body {
+      background-color: #1e1e2f;
+      color: #f0f0f0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #61dafb;
+      margin-bottom: 30px;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .menu-card {
+      background-color: #2c2c3e;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .menu-card:hover {
+      transform: translateY(-5px);
+      background-color: #3a3a5c;
+    }
+
+    .menu-card a {
+      text-decoration: none;
+      color: #61dafb;
+      font-size: 18px;
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+
+    .menu-card span {
+      font-size: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🚀 Bot Control Center</h1>
+
+  <div class="menu-grid">
+    <div class="menu-card">
+      <span>📋</span>
+      <a href="/dashboard">Role Dashboard</a>
+    </div>
+    <div class="menu-card">
+      <span>📊</span>
+      <a href="/stats">Server Stats</a>
+    </div>
+    <div class="menu-card">
+      <span>🖥️</span>
+      <a href="/terminal">Terminal</a>
+    </div>
+    <div class="menu-card">
+      <span>⚙️</span>
+      <a href="/commands">Command Shortcuts</a>
+    </div>
+    <div class="menu-card">
+  <span>👥</span>
+  <a href="/users">Manage Users</a>
+</div>
+    <div class="menu-card">
+      <span>🚪</span>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+</body>
+</html>

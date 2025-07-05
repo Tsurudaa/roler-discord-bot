@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Role</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .role-editor {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #2c2c3e;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .role-editor h2 {
+      color: #61dafb;
+      margin-bottom: 20px;
+    }
+
+    .role-editor label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+
+    .role-editor input[type="text"],
+    .role-editor input[type="color"] {
+      width: 100%;
+      padding: 10px;
+      background: #1e1e2f;
+      color: #f0f0f0;
+      border: none;
+      border-radius: 6px;
+    }
+
+    .role-editor .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .role-editor .checkbox-group label {
+      background: #1e1e2f;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .role-editor .checkbox-group input {
+      margin-right: 6px;
+    }
+
+    .role-editor button {
+      margin-top: 20px;
+      background: #5865F2;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .role-editor button:hover {
+      background: #4752c4;
+    }
+
+    .switch-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e1e2f;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin: 5px 0;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    .switch input:checked + .slider {
+      background-color: #5865F2;
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .permission-group {
+      margin-bottom: 20px;
+    }
+
+    .permission-list {
+      margin-top: 10px;
+    }
+
+    .color-picker {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 15px 0;
+}
+
+.color-picker input[type="color"] {
+  appearance: none;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 5px #000;
+  transition: transform 0.2s ease;
+}
+
+.color-picker input[type="color"]:hover {
+  transform: scale(1.1);
+}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Edit Role: <%= role.name %></h1>
+    <a href="/dashboard" class="back-button">← Back to Dashboard</a>
+  </header>
+
+  <form class="role-editor" method="POST" action="/roles/edit/<%= role.id %>">
+    <h2>Basic Settings</h2>
+    <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+      <input type="text" name="name" value="<%= role.name %>" required style="text-align: center; width: 60%; font-size: 18px; padding: 10px; border-radius: 6px; background-color: #1e1e2f; color: #f0f0f0; border: none; box-shadow: inset 0 0 5px rgba(0,0,0,0.5);">
+    </div>
+
+    <div class="color-picker">
+  <label for="color">🎨 Role Color</label>
+  <input type="color" name="color" value="<%= role.color %>">
+  </div>
+
+   <div class="toggle-row">
+  <span>👥 Display role members separately</span>
+  <label class="switch">
+    <input type="checkbox" name="hoist" <%= role.hoist ? 'checked' : '' %>>
+    <span class="slider round"></span>
+  </label>
+</div>
+
+<div class="toggle-row">
+  <span>🔔 Allow role to be mentioned</span>
+  <label class="switch">
+    <input type="checkbox" name="mentionable" <%= role.mentionable ? 'checked' : '' %>>
+    <span class="slider round"></span>
+  </label>
+</div>
+
+    <h2>Permissions</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <label style="display: flex; align-items: center; gap: 8px;">
+        <input type="checkbox" id="toggle-all" />
+        <strong>Enable All Permissions</strong>
+      </label>
+      <button type="button" id="reset-perms" style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
+        Reset All
+      </button>
+    </div>
+
+    <div class="permission-categories">
+      <% for (const [category, perms] of Object.entries(permissionCategories)) { %>
+        <div class="permission-group">
+          <button type="button" class="toggle-category"><%= category %> ⯆</button>
+          <div class="permission-list">
+            <% perms.forEach(perm => { %>
+              <label class="switch-label">
+                <span><%= perm.replace(/([A-Z])/g, ' $1').trim() %></span>
+                <label class="switch">
+                  <input type="checkbox" name="permissions" value="<%= perm %>" class="perm-checkbox" <%= role.permissions.includes(perm) ? 'checked' : '' %>>
+                  <span class="slider"></span>
+                </label>
+              </label>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+    </div>
+
+    <button type="submit">💾 Save Changes</button>
+  </form>
+
+  <script>
+    document.querySelectorAll('.toggle-category').forEach(button => {
+      button.addEventListener('click', () => {
+        const group = button.closest('.permission-group');
+        group.classList.toggle('active');
+      });
+    });
+
+    const toggleAll = document.getElementById('toggle-all');
+    const resetButton = document.getElementById('reset-perms');
+    const checkboxes = document.querySelectorAll('.perm-checkbox');
+
+    function updateToggleAllState() {
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      toggleAll.checked = allChecked;
+    }
+
+    toggleAll.addEventListener('change', () => {
+      checkboxes.forEach(cb => cb.checked = toggleAll.checked);
+    });
+
+    resetButton.addEventListener('click', () => {
+      checkboxes.forEach(cb => cb.checked = false);
+      toggleAll.checked = false;
+    });
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (!cb.checked) toggleAll.checked = false;
+        else updateToggleAllState();
+      });
+    });
+
+    updateToggleAllState();
+  </script>
+</body>
+</html>

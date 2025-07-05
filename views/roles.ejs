@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Roles</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .role-list {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .role-card {
+      background: #2c2c3e;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .role-card span {
+      font-weight: bold;
+    }
+
+    .role-card .color-box {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    .role-card a {
+      background: #5865F2;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .role-card a:hover {
+      background: #4752c4;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎛️ Manage Roles</h1>
+    <a href="/dashboard" class="back-button">← Back to Dashboard</a>
+  </header>
+
+  <div class="role-list">
+    <% roles.forEach(role => { %>
+      <div class="role-card">
+        <div>
+          <span class="color-box" style="background-color: <%= role.color %>"></span>
+          <span><%= role.name %></span>
+        </div>
+        <a href="/roles/edit/<%= role.id %>">Edit</a>
+      </div>
+    <% }) %>
+  </div>
+</body>
+</html>

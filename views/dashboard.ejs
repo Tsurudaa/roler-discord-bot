@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Role Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+  <h1>Welcome, <%= user.username %>!</h1>
+  <a href="/menu" class="back-button">← Back to Menu</a>
+  <a href="/roles" class="edit-roles-button">🎛️ Manage Roles</a>
+</header>
+
+  <div class="role-filter">
+  <label for="roleSelect">Select a role:</label>
+  <select id="roleSelect">
+    <option value="">-- Choose a role --</option>
+    <% roles.forEach(role => { %>
+      <option value="<%= role.id %>"><%= role.name %></option>
+    <% }) %>
+  </select>
+</div>
+
+<form method="POST" action="/roles/create" class="create-role-form">
+  <input type="text" name="name" placeholder="Role name" required>
+  <input type="color" name="color" value="#5865F2">
+  <label><input type="checkbox" name="hoist"> Display separately</label>
+  <label><input type="checkbox" name="mentionable"> Mentionable</label>
+  <button type="submit">➕ Create Role</button>
+</form>
+
+<table id="memberTable" style="display: none;">
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Roles</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+
+  <script>
+  const members = <%- JSON.stringify(members) %>;
+  const roles = <%- JSON.stringify(roles) %>;
+
+  const table = document.getElementById('memberTable');
+  const tbody = table.querySelector('tbody');
+  const roleSelect = document.getElementById('roleSelect');
+
+  roleSelect.addEventListener('change', () => {
+    const selectedRole = roleSelect.value;
+    tbody.innerHTML = '';
+
+    if (!selectedRole) {
+      table.style.display = 'none';
+      return;
+    }
+
+    const filtered = members.filter(m => m.roles.includes(selectedRole));
+    filtered.forEach(member => {
+      const row = document.createElement('tr');
+      const roleLinks = member.roles
+  .map(rid => {
+    const role = roles.find(r => r.id === rid);
+    return role ? `<a href="/roles/edit/${role.id}">${role.name}</a>` : '';
+  })
+  .filter(link => link !== '')
+  .join(', ');
+
+row.innerHTML = `
+  <td class="user-hover" data-id="${member.id}">${member.displayName}</td>
+  <td>${roleLinks}</td>
+`;
+
+      tbody.appendChild(row);
+    });
+
+    table.style.display = '';
+  });
+
+  // Handle hover popup
+  let activePopup = null;
+  document.addEventListener('mouseover', e => {
+    if (e.target.classList.contains('user-hover')) {
+      const userId = e.target.dataset.id;
+      const member = members.find(m => m.id === userId);
+
+      // Remove any existing popup
+      if (activePopup) activePopup.remove();
+
+      const popup = document.createElement('div');
+      popup.className = 'role-popup';
+
+      roles.forEach(role => {
+        const checked = member.roles.includes(role.id) ? 'checked' : '';
+        popup.innerHTML += `
+          <label>
+            <input type="checkbox" data-role="${role.id}" data-user="${userId}" ${checked}>
+            ${role.name}
+          </label>
+        `;
+      });
+
+      document.body.appendChild(popup);
+      const rect = e.target.getBoundingClientRect();
+      popup.style.top = `${rect.bottom + window.scrollY}px`;
+      popup.style.left = `${rect.left + window.scrollX}px`;
+      popup.style.display = 'block';
+      activePopup = popup;
+
+      // Keep popup open while hovering over it
+      let isHovering = true;
+
+      const closePopup = () => {
+        if (!isHovering) {
+          popup.remove();
+          activePopup = null;
+        }
+      };
+
+      popup.addEventListener('mouseenter', () => isHovering = true);
+      popup.addEventListener('mouseleave', () => {
+        isHovering = false;
+        setTimeout(closePopup, 200);
+      });
+
+      e.target.addEventListener('mouseleave', () => {
+        isHovering = false;
+        setTimeout(closePopup, 200);
+      });
+
+      popup.addEventListener('change', async evt => {
+        const roleId = evt.target.dataset.role;
+        const userId = evt.target.dataset.user;
+        const action = evt.target.checked ? 'assign' : 'remove';
+
+        await fetch(`/${action}-role`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `userId=${userId}&roleId=${roleId}`
+        });
+      });
+    }
+  });
+</script>
+
+</body>
+</html>

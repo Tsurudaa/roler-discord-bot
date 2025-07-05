@@ -1,0 +1,36 @@
+<link rel="stylesheet" href="/style.css">
+<a href="/menu" class="back-button">← Back to Menu</a>
+
+<table class="user-table">
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Nickname</th>
+      <th>Roles</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% members.forEach(member => { %>
+      <tr>
+        <td>
+          <img src="<%= member.avatar %>" class="user-avatar">
+          <span class="user-tag"><%= member.tag %></span>
+        </td>
+        <td><%= member.nickname || '-' %></td>
+        <td class="user-roles"><%= member.roles.join(', ') || '-' %></td>
+        <td>
+          <form method="POST" action="/users/action" class="action-form">
+            <input type="hidden" name="userId" value="<%= member.id %>">
+            <select name="action">
+              <option value="timeout">Silence</option>
+              <% if (member.isKickable) { %><option value="kick">Kick</option><% } %>
+              <% if (member.isBannable) { %><option value="ban">Ban</option><% } %>
+            </select>
+            <button type="submit">Apply</button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

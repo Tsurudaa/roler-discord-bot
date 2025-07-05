@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bot Terminal</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: #dcdcdc;
+      font-family: Consolas, 'Courier New', monospace;
+      margin: 0;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      color: #00afff;
+    }
+
+    a {
+      color: #61dafb;
+      text-decoration: none;
+    }
+
+    .terminal {
+      background-color: #0c0c0c;
+      border: 1px solid #333;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 800px;
+      margin: 0 auto;
+      box-shadow: 0 0 10px rgba(0, 175, 255, 0.2);
+    }
+
+    .terminal form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .terminal input[type="text"] {
+      flex: 1;
+      background-color: #1e1e1e;
+      border: none;
+      border-bottom: 2px solid #00afff;
+      color: #dcdcdc;
+      font-size: 16px;
+      padding: 8px;
+      outline: none;
+    }
+
+    .terminal button {
+      background-color: #007acc;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .terminal button:hover {
+      background-color: #005f99;
+    }
+
+    .terminal pre {
+      background-color: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-left: 4px solid #00afff;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🖥️ Bot Terminal</h1>
+    <a href="/menu">← Back to Menu</a>
+  </header>
+
+  <section class="terminal">
+    <form method="POST" action="/terminal">
+      <input type="text" name="command" placeholder="> Enter command..." required autocomplete="off">
+      <button type="submit">Run</button>
+    </form>
+
+    <% if (output) { %>
+      <pre><%= output %></pre>
+    <% } %>
+  </section>
+</body>
+</html>
