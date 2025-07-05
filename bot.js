@@ -61,8 +61,6 @@ function setSocket(serverIO) {
   io = serverIO;
 }
 
-const { EmbedBuilder } = require('discord.js');
-
 bot.on('guildMemberAdd', async member => {
   const channel = member.guild.channels.cache.get(WELCOME_CHANNEL_ID);
   if (!channel) return;
